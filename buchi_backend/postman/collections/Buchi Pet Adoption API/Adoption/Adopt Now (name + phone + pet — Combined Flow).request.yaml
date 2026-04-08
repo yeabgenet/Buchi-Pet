@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/adopt_now"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Tigist Alemu",
+      "phone": "0911234567",
+      "pet_id": "1"
+    }
+examples: ./.resources/Adopt Now (name + phone + pet — Combined Flow).resources/examples
+order: 2000

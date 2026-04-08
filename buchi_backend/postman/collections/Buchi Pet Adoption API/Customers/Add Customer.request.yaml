@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/add_customer"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Abebe Kebede",
+      "phone": "0922222222"
+    }
+examples: ./.resources/Add Customer.resources/examples
+order: 1000

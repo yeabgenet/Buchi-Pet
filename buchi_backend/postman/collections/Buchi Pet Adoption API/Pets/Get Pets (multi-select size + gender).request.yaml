@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/get_pets?size=small&size=medium&size=large&gender=male&gende\
+  r=female&limit=10"
+method: GET
+queryParams:
+  - key: size
+    value: small
+  - key: size
+    value: medium
+  - key: size
+    value: large
+  - key: gender
+    value: male
+  - key: gender
+    value: female
+  - key: limit
+    value: "10"
+order: 4000

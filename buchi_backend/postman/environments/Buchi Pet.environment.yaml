@@ -1,0 +1,11 @@
+name: Buchi Pet
+values:
+  - key: base_url
+    value: ''
+    enabled: true
+  - key: pet_id
+    value: ''
+    enabled: true
+  - key: customer_id
+    value: ''
+    enabled: true

@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/get_pets?type=Dog&type=Cat&age=baby&age=young&limit=10"
+method: GET
+queryParams:
+  - key: type
+    value: Dog
+  - key: type
+    value: Cat
+  - key: age
+    value: baby
+  - key: age
+    value: young
+  - key: limit
+    value: "10"
+order: 3000

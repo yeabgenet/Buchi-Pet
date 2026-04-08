@@ -1,0 +1,33 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/get_pets?type=Dog&size=small&age=baby&good_with_children=tru\
+    e&limit=5"
+  method: GET
+  queryParams:
+    type: Dog
+    size: small
+    age: baby
+    good_with_children: "true"
+    limit: "5"
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: |-
+      {
+        "status": "success",
+        "pets": [
+          {
+            "pet_id": "1",
+            "source": "local",
+            "type": "Dog",
+            "gender": "male",
+            "size": "small",
+            "age": "baby",
+            "good_with_children": true,
+            "Photos": ["http://localhost:8000/uploads/1_abc.jpg"]
+          }
+        ]
+      }
+order: 1000

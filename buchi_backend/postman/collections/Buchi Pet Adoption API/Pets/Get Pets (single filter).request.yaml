@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/get_pets?type=Dog&size=small&age=baby&good_with_children=tru\
+  e&limit=5"
+method: GET
+queryParams:
+  type: Dog
+  size: small
+  age: baby
+  good_with_children: "true"
+  limit: "5"
+examples: ./.resources/Get Pets (single filter).resources/examples
+order: 2000

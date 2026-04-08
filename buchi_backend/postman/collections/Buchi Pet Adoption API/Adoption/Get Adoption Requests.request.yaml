@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{base_url}}/get_adoption_requests?from_date=2022-02-01&to_date=2022-03-01"
+method: GET
+queryParams:
+  from_date: 2022-02-01
+  to_date: 2022-03-01
+examples: ./.resources/Get Adoption Requests.resources/examples
+order: 3000

@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/generate_report"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "from_date": "2022-02-01",
+      "to_date": "2022-03-01"
+    }
+examples: ./.resources/Generate Report.resources/examples
+order: 1000

@@ -1,0 +1,23 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/adopt"
+  method: POST
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "customer_id": "1",
+        "pet_id": "1"
+      }
+response:
+  statusCode: 404
+  statusText: Not Found
+  body:
+    type: text
+    content: |-
+      {
+        "detail": "Customer 999 not found"
+      }
+order: 2000

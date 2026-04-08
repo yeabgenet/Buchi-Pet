@@ -1,0 +1,30 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/get_adoption_requests?from_date=2022-02-01&to_date=2022-03-01"
+  method: GET
+  queryParams:
+    from_date: 2022-02-01
+    to_date: 2022-03-01
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: |-
+      {
+        "status": "success",
+        "data": [
+          {
+            "customer_id": "1",
+            "customer_phone": "0922222222",
+            "customer_name": "Abebe Kebede",
+            "Pet_id": "1",
+            "type": "Dog",
+            "gender": "male",
+            "size": "small",
+            "age": "baby",
+            "good_with_children": true
+          }
+        ]
+      }
+order: 1000

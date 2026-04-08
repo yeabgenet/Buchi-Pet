@@ -1,0 +1,14 @@
+$kind: collection
+description: |-
+  Production-ready FastAPI backend for Buchi Pet Adoption platform.
+
+  Base URL: http://localhost:8000
+
+  **Features:**
+  - Multi-select pet search filters
+  - Local DB + Petfinder API fallback
+  - Combined adopt flow (name + phone + pet_id)
+  - Report generation
+  - AI-style pet matching
+variables:
+  base_url: http://localhost:8000

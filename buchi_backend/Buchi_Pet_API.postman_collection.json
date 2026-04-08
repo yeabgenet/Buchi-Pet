@@ -1,0 +1,305 @@
+{
+  "info": {
+    "_postman_id": "buchi-pet-api-v1",
+    "name": "Buchi Pet Adoption API",
+    "description": "Production-ready FastAPI backend for Buchi Pet Adoption platform.\n\nBase URL: http://localhost:8000\n\n**Features:**\n- Multi-select pet search filters\n- Local DB + Petfinder API fallback\n- Combined adopt flow (name + phone + pet_id)\n- Report generation\n- AI-style pet matching",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pets",
+      "item": [
+        {
+          "name": "Create Pet (with photos)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "type", "value": "Dog", "type": "text" },
+                { "key": "gender", "value": "male", "type": "text" },
+                { "key": "size", "value": "small", "type": "text" },
+                { "key": "age", "value": "baby", "type": "text" },
+                { "key": "good_with_children", "value": "true", "type": "text" },
+                { "key": "Photo", "type": "file", "src": [] }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/create_pet", "host": ["{{base_url}}"], "path": ["create_pet"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"pet_id\": \"7278942789482\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Pets (single filter)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/get_pets?type=Dog&size=small&age=baby&good_with_children=true&limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["get_pets"],
+              "query": [
+                { "key": "type", "value": "Dog" },
+                { "key": "size", "value": "small" },
+                { "key": "age", "value": "baby" },
+                { "key": "good_with_children", "value": "true" },
+                { "key": "limit", "value": "5" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"pets\": [\n    {\n      \"pet_id\": \"1\",\n      \"source\": \"local\",\n      \"type\": \"Dog\",\n      \"gender\": \"male\",\n      \"size\": \"small\",\n      \"age\": \"baby\",\n      \"good_with_children\": true,\n      \"Photos\": [\"http://localhost:8000/uploads/1_abc.jpg\"]\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Pets (multi-select type + age)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/get_pets?type=Dog&type=Cat&age=baby&age=young&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["get_pets"],
+              "query": [
+                { "key": "type", "value": "Dog" },
+                { "key": "type", "value": "Cat" },
+                { "key": "age", "value": "baby" },
+                { "key": "age", "value": "young" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Pets (multi-select size + gender)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/get_pets?size=small&size=medium&size=large&gender=male&gender=female&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["get_pets"],
+              "query": [
+                { "key": "size", "value": "small" },
+                { "key": "size", "value": "medium" },
+                { "key": "size", "value": "large" },
+                { "key": "gender", "value": "male" },
+                { "key": "gender", "value": "female" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Pet Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/get_pets/1",
+              "host": ["{{base_url}}"],
+              "path": ["get_pets", "1"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"pet_id\": \"1\",\n  \"source\": \"local\",\n  \"type\": \"Dog\",\n  \"gender\": \"male\",\n  \"size\": \"small\",\n  \"age\": \"baby\",\n  \"good_with_children\": true,\n  \"Photos\": [],\n  \"breed\": null,\n  \"created_at\": \"2024-01-01T00:00:00\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "Add Customer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Abebe Kebede\",\n  \"phone\": \"0922222222\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/add_customer", "host": ["{{base_url}}"], "path": ["add_customer"] }
+          },
+          "response": [
+            {
+              "name": "Success (new customer)",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"customer_id\": \"7278942789482\"\n}"
+            },
+            {
+              "name": "Success (existing phone - returns same ID)",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"customer_id\": \"7278942789482\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Adoption",
+      "item": [
+        {
+          "name": "Adopt (by IDs)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer_id\": \"1\",\n  \"pet_id\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/adopt", "host": ["{{base_url}}"], "path": ["adopt"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"adoption_id\": \"7278942789482\"\n}"
+            },
+            {
+              "name": "Customer Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"detail\": \"Customer 999 not found\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Adopt Now (name + phone + pet — Combined Flow)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tigist Alemu\",\n  \"phone\": \"0911234567\",\n  \"pet_id\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/adopt_now", "host": ["{{base_url}}"], "path": ["adopt_now"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"adoption_id\": \"3\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Adoption Requests",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/get_adoption_requests?from_date=2022-02-01&to_date=2022-03-01",
+              "host": ["{{base_url}}"],
+              "path": ["get_adoption_requests"],
+              "query": [
+                { "key": "from_date", "value": "2022-02-01" },
+                { "key": "to_date", "value": "2022-03-01" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": [\n    {\n      \"customer_id\": \"1\",\n      \"customer_phone\": \"0922222222\",\n      \"customer_name\": \"Abebe Kebede\",\n      \"Pet_id\": \"1\",\n      \"type\": \"Dog\",\n      \"gender\": \"male\",\n      \"size\": \"small\",\n      \"age\": \"baby\",\n      \"good_with_children\": true\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Generate Report",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"from_date\": \"2022-02-01\",\n  \"to_date\": \"2022-03-01\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/generate_report", "host": ["{{base_url}}"], "path": ["generate_report"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"data\": {\n    \"adopted_pet_types\": {\n      \"Cat\": 12,\n      \"Dog\": 34\n    },\n    \"weekly_adoption_requests\": {\n      \"2022-02-01\": 10,\n      \"2022-02-08\": 13,\n      \"2022-02-15\": 9\n    }\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pet Match",
+      "item": [
+        {
+          "name": "Pet Match (AI Recommendation)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"Dog\",\n  \"age\": \"baby\",\n  \"size\": \"small\",\n  \"good_with_children\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/pet_match", "host": ["{{base_url}}"], "path": ["pet_match"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"status\": \"success\",\n  \"pets\": [\n    {\n      \"pet_id\": \"1\",\n      \"source\": \"local\",\n      \"type\": \"Dog\",\n      \"gender\": \"male\",\n      \"size\": \"small\",\n      \"age\": \"baby\",\n      \"good_with_children\": true,\n      \"Photos\": []\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

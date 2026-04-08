@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/adopt"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "customer_id": "1",
+      "pet_id": "1"
+    }
+examples: ./.resources/Adopt (by IDs).resources/examples
+order: 1000

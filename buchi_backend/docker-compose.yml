@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: buchi_db
+    restart: always
+    environment:
+      POSTGRES_USER: buchi
+      POSTGRES_PASSWORD: buchi123
+      POSTGRES_DB: buchi
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U buchi -d buchi"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: .
+    container_name: buchi_backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://buchi:buchi123@db:5432/buchi
+      THE_DOG_API_KEY: live_FaYmzbSutgkuhqRJ7S6e2cjrGBZId4QOuVJ5lYHqESMJRheLQ7glleIdlnhBtoVc
+      UPLOAD_DIR: /app/uploads
+      BASE_URL: http://localhost:8000
+    volumes:
+      - ./uploads:/app/uploads
+      - .:/app
+
+volumes:
+  postgres_data:

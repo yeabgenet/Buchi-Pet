@@ -1,0 +1,26 @@
+$kind: http-request
+url: "{{base_url}}/create_pet"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: type
+      value: Dog
+    - type: text
+      key: gender
+      value: male
+    - type: text
+      key: size
+      value: small
+    - type: text
+      key: age
+      value: baby
+    - type: text
+      key: good_with_children
+      value: "true"
+    - type: file
+      key: Photo
+      src: []
+examples: ./.resources/Create Pet (with photos).resources/examples
+order: 1000

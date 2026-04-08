@@ -1,0 +1,16 @@
+$kind: http-request
+url: "{{base_url}}/pet_match"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "type": "Dog",
+      "age": "baby",
+      "size": "small",
+      "good_with_children": true
+    }
+examples: ./.resources/Pet Match (AI Recommendation).resources/examples
+order: 1000

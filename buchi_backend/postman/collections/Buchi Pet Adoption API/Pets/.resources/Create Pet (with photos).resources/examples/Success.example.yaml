@@ -1,0 +1,36 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/create_pet"
+  method: POST
+  body:
+    type: formdata
+    content:
+      - type: text
+        key: type
+        value: Dog
+      - type: text
+        key: gender
+        value: male
+      - type: text
+        key: size
+        value: small
+      - type: text
+        key: age
+        value: baby
+      - type: text
+        key: good_with_children
+        value: "true"
+      - type: file
+        key: Photo
+        src: []
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: |-
+      {
+        "status": "success",
+        "pet_id": "7278942789482"
+      }
+order: 1000

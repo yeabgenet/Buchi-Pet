@@ -1,0 +1,37 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/pet_match"
+  method: POST
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "type": "Dog",
+        "age": "baby",
+        "size": "small",
+        "good_with_children": true
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: |-
+      {
+        "status": "success",
+        "pets": [
+          {
+            "pet_id": "1",
+            "source": "local",
+            "type": "Dog",
+            "gender": "male",
+            "size": "small",
+            "age": "baby",
+            "good_with_children": true,
+            "Photos": []
+          }
+        ]
+      }
+order: 1000

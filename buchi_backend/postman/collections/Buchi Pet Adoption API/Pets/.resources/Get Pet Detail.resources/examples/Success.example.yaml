@@ -1,0 +1,23 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/get_pets/1"
+  method: GET
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: |-
+      {
+        "pet_id": "1",
+        "source": "local",
+        "type": "Dog",
+        "gender": "male",
+        "size": "small",
+        "age": "baby",
+        "good_with_children": true,
+        "Photos": [],
+        "breed": null,
+        "created_at": "2024-01-01T00:00:00"
+      }
+order: 1000

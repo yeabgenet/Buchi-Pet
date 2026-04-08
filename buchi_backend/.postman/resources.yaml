@@ -1,0 +1,11 @@
+# Use this workspace to collaborate
+workspace:
+  id: 52fb7adb-9e9d-4ac4-8a1e-a86c445f37f8
+
+localResources:
+  collections:
+    - ../Buchi_Pet_API.postman_collection.json
+
+cloudResources:
+  collections:
+    ../postman/collections/Buchi Pet Adoption API: af3a2b36-94f4-4ba6-830d-e14cf3388a06

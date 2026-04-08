@@ -1,0 +1,25 @@
+$kind: http-example
+request:
+  url: "{{base_url}}/adopt_now"
+  method: POST
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "name": "Tigist Alemu",
+        "phone": "0911234567",
+        "pet_id": "1"
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  body:
+    type: text
+    content: |-
+      {
+        "status": "success",
+        "adoption_id": "3"
+      }
+order: 1000
