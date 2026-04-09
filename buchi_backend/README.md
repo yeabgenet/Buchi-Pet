@@ -2,7 +2,17 @@
 
 A production-ready **FastAPI** backend for a pet adoption platform.
 
-📚 **[API Documentation (Postman)](POSTMAN.md)** | 🚀 **[Production Deployment Guide](PRODUCTION.md)** | 🧪 **[Run Tests](#testing)**
+
+
+## Tech Stack
+
+- Python 3.11+
+- FastAPI framework
+- SQLAlchemy ORM + Pydantic schemas
+- PostgreSQL 15 database
+- Docker Compose for local deployment
+- HTTPX for async external API calls
+- Local image uploads served from `uploads/`
 
 ## Features
 
@@ -21,10 +31,10 @@ A production-ready **FastAPI** backend for a pet adoption platform.
 # Clone and navigate to the project
 cd buchi_backend
 
-# Run with Docker (recommended - works on any computer with Docker)
+# Run with Docker
 docker-compose up
 
-# Or with build (first time or after changes)
+# Rebuild after changes
 docker-compose up --build
 ```
 
@@ -35,6 +45,17 @@ docker-compose up --build
 **Requirements:**
 - Docker Desktop installed
 - No local PostgreSQL needed (runs in Docker container)
+
+---
+
+## Third-party API Endpoints
+
+- TheDogAPI search: `https://api.thedogapi.com/v1/images/search`
+- TheDogAPI upload image: `https://api.thedogapi.com/v1/images/upload`
+- TheDogAPI list images: `https://api.thedogapi.com/v1/images`
+- TheDogAPI image details / delete: `https://api.thedogapi.com/v1/images/{image_id}`
+
+This project uses TheDogAPI as an external data source for pet search fallback and image uploads.
 
 ---
 
@@ -144,9 +165,6 @@ python -m pytest app/tests/ --cov=app --cov-report=html
 
 Import the Postman collection from `Buchi_Pet_API.postman_collection.json`
 
-See [POSTMAN.md](POSTMAN.md) for detailed documentation.
-
----
 
 ## Production Deployment
 
@@ -155,5 +173,3 @@ The app supports multiple production server configurations:
 1. **Gunicorn** (recommended): `gunicorn app.main:app --config gunicorn.conf.py`
 2. **uWSGI**: `uwsgi --ini uwsgi.ini`
 3. **Docker**: `docker-compose up --build`
-
-See [PRODUCTION.md](PRODUCTION.md) for complete deployment instructions.
