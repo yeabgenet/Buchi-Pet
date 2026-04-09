@@ -172,4 +172,4 @@ The app supports multiple production server configurations:
 
 1. **Gunicorn** (recommended): `gunicorn app.main:app --config gunicorn.conf.py`
 2. **uWSGI**: `uwsgi --ini uwsgi.ini`
-3. **Docker**: `docker-compose up --build`
+3. **Docker**:` docker-compose up` or `docker-compose up --build`
