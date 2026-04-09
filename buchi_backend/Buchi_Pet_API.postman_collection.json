@@ -137,6 +137,93 @@
               "body": "{\n  \"pet_id\": \"1\",\n  \"source\": \"local\",\n  \"type\": \"Dog\",\n  \"gender\": \"male\",\n  \"size\": \"small\",\n  \"age\": \"baby\",\n  \"good_with_children\": true,\n  \"Photos\": [],\n  \"breed\": null,\n  \"created_at\": \"2024-01-01T00:00:00\"\n}"
             }
           ]
+        },
+        {
+          "name": "Upload Dog Image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": [] },
+                { "key": "sub_id", "value": "demo_user", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{base_url}}/upload_dog_image", "host": ["{{base_url}}"], "path": ["upload_dog_image"] }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"message\": \"Image uploaded successfully\",\n  \"data\": {\n    \"id\": \"FjQPVSf8Ef\",\n    \"status\": \"labelled\",\n    \"upload_timestamp\": \"2026-04-09T12:13:49.078Z\",\n    \"links\": {\n      \"self\": \"/images/FjQPVSf8Ef\",\n      \"status\": \"/images/FjQPVSf8Ef/status\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "List Uploaded Images",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/list_uploaded_images?sub_id=demo_user&limit=5",
+              "host": ["{{base_url}}"],
+              "path": ["list_uploaded_images"],
+              "query": [
+                { "key": "sub_id", "value": "demo_user" },
+                { "key": "limit", "value": "5" }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"images\": [\n    {\n      \"id\": \"FjQPVSf8Ef\",\n      \"url\": \"https://cdn4.thedogapi.com/optimized/FjQPVSf8Ef.jpg\",\n      \"width\": 348,\n      \"height\": 500,\n      \"breeds\": [],\n      \"categories\": []\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Image Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/get_image/FjQPVSf8Ef",
+              "host": ["{{base_url}}"],
+              "path": ["get_image", "FjQPVSf8Ef"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"id\": \"FjQPVSf8Ef\",\n  \"url\": \"https://storage.googleapis.com/dog-api-uploads-prod/originals/2588af1d-d670-4629-9760-ab4bd97c3860.jpeg\",\n  \"width\": 348,\n  \"height\": 500,\n  \"breeds\": [\n    {\n      \"id\": \"2\",\n      \"name\": \"Afghan Hound\",\n      \"species_id\": \"2\",\n      \"life_span\": \"12-15\",\n      \"temperament\": \"Independent, dignified, aloof, loyal, confident\",\n      \"origin\": \"Afghanistan\",\n      \"country_code\": \"AF\",\n      \"description\": \"Ancient, elegant sighthound with dramatic, flowing silky coat and aristocratic bearing, bred for hunting large prey in mountainous terrain\",\n      \"bred_for\": null,\n      \"perfect_for\": null,\n      \"breed_group\": \"Hound\",\n      \"history\": \"Ancient sighthound originating in the mountainous regions of Afghanistan, where they were prized for hunting large prey like gazelles and leopards. Valued for their speed, stamina, and problem-solving intelligence over rugged terrain. Introduced to the Western world by British officers in the early 20th century.\",\n      \"alt_names\": null,\n      \"wikipedia_url\": \"https://en.wikipedia.org/wiki/Afghan_Hound\",\n      \"reference_image_id\": \"atummvxJRT\"\n    }\n  ],\n  \"categories\": []\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete Image",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/delete_image/FjQPVSf8Ef",
+              "host": ["{{base_url}}"],
+              "path": ["delete_image", "FjQPVSf8Ef"]
+            }
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"message\": \"Image deleted successfully\"\n}"
+            }
+          ]
         }
       ]
     },

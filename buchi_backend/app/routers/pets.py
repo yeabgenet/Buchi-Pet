@@ -7,6 +7,7 @@ from app import crud
 from app.schemas import CreatePetResponse, GetPetsResponse, PetOut, PetDetailOut
 from app.utils.file_handler import save_upload
 from app.utils.the_dog_api import search_the_dog_api
+from app.utils.petfinder_api import upload_image, list_uploaded_images, get_image_details, delete_image
 from app.models import PetPhoto
 
 router = APIRouter(tags=["Pets"])
@@ -124,3 +125,61 @@ def get_pet_detail(
     if not pet:
         raise HTTPException(status_code=404, detail=f"Pet {pet_id} not found")
     return PetDetailOut(**pet)
+
+
+@router.post("/upload_dog_image")
+async def upload_dog_image(
+    file: UploadFile = File(...),
+    sub_id: Optional[str] = Form(None),
+):
+    """
+    Upload a dog image to TheDogAPI.
+    Accepts multipart/form-data with file and optional sub_id.
+    """
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+
+    file_data = await file.read()
+    result = await upload_image(file_data, file.filename, sub_id)
+    if not result:
+        raise HTTPException(status_code=500, detail="Upload failed")
+
+    return {"message": "Image uploaded successfully", "data": result}
+
+
+@router.get("/list_uploaded_images")
+async def list_user_uploaded_images(
+    sub_id: Optional[str] = Query(None, description="Filter by sub_id"),
+    limit: int = Query(10, ge=1, le=100),
+):
+    """
+    List uploaded dog images from TheDogAPI.
+    Optionally filter by sub_id.
+    """
+    images = await list_uploaded_images(sub_id, limit)
+    return {"images": images}
+
+
+@router.get("/get_image/{image_id}")
+async def get_dog_image_details(image_id: str):
+    """
+    Get details of a specific uploaded dog image by ID.
+    """
+    details = await get_image_details(image_id)
+    if not details:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    return details
+
+
+@router.delete("/delete_image/{image_id}")
+async def delete_dog_image(image_id: str):
+    """
+    Delete an uploaded dog image by ID.
+    """
+    success = await delete_image(image_id)
+    if not success:
+        raise HTTPException(status_code=500, detail="Delete failed")
+
+    return {"message": "Image deleted successfully"}
+

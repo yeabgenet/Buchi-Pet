@@ -19,11 +19,11 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Create all tables on startup."""
-    logger.info("Creating database tables...")
-    engine = get_engine()
-    Base.metadata.create_all(bind=engine)
-    os.makedirs(settings.upload_dir, exist_ok=True)
-    logger.info(f"Upload directory ready: {settings.upload_dir}")
+    # logger.info("Creating database tables...")
+    # engine = get_engine()
+    # Base.metadata.create_all(bind=engine)
+    # os.makedirs(settings.upload_dir, exist_ok=True)
+    # logger.info(f"Upload directory ready: {settings.upload_dir}")
     yield
     logger.info("Shutting down Buchi backend...")
 

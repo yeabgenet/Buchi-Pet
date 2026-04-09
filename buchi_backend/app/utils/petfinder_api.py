@@ -1,79 +1,40 @@
 import httpx
 import logging
-from typing import Optional
+from typing import Optional, List, Dict, Any
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-PETFINDER_BASE = "https://api.petfinder.com/v2"
-
-# Token cache
-_token_cache: dict = {"access_token": None, "expires_in": 0}
+THE_DOG_API_BASE = "https://api.thedogapi.com/v1"
 
 
-async def _get_access_token() -> str:
-    """Fetch a new OAuth2 token from Petfinder if needed."""
-    import time
-
-    if _token_cache["access_token"] and _token_cache["expires_in"] > time.time():
-        return _token_cache["access_token"]
-
-    # Petfinder uses client_credentials flow
-    # The key is both client_id and client_secret (for secret key APIs)
-    async with httpx.AsyncClient(timeout=10) as client:
-        resp = await client.post(
-            f"{PETFINDER_BASE}/oauth2/token",
-            data={
-                "grant_type": "client_credentials",
-                "client_id": settings.petfinder_api_key,
-                "client_secret": settings.petfinder_api_key,
-            },
-        )
-        if resp.status_code != 200:
-            logger.warning(f"Petfinder token fetch failed: {resp.text}")
-            return ""
-
-        data = resp.json()
-        _token_cache["access_token"] = data.get("access_token", "")
-        _token_cache["expires_in"] = time.time() + data.get("expires_in", 3600) - 60
-        return _token_cache["access_token"]
-
-
-def _map_petfinder_animal(animal: dict) -> dict:
-    """Convert a Petfinder animal object to our PetOut schema."""
+def _map_thedogapi_item(item: dict) -> dict:
+    """Convert a TheDogAPI image object to our PetOut schema."""
     photos = []
-    for photo in animal.get("photos", []):
-        url = photo.get("medium") or photo.get("small") or photo.get("full")
-        if url:
-            photos.append(url)
+    if item.get("url"):
+        photos.append(item["url"])
+    if item.get("image") and item["image"].get("url"):
+        photos.append(item["image"]["url"])
 
-    age_map = {
-        "Baby": "baby",
-        "Young": "young",
-        "Adult": "adult",
-        "Senior": "senior",
-    }
-    size_map = {
-        "Small": "small",
-        "Medium": "medium",
-        "Large": "large",
-        "Extra Large": "large",
-    }
-    gender_map = {
-        "Male": "male",
-        "Female": "female",
-        "Unknown": None,
-    }
+    temperament = ""
+    breeds = item.get("breeds") or []
+    if breeds and isinstance(breeds, list):
+        temperament = breeds[0].get("temperament", "") or ""
+
+    good_with_children = None
+    if temperament:
+        temp_lower = temperament.lower()
+        good_with_children = any(word in temp_lower for word in ["good", "friendly", "children", "family"])
 
     return {
-        "pet_id": str(animal.get("id", "")),
-        "source": "petfinder",
-        "type": animal.get("type", "Unknown"),
-        "gender": gender_map.get(animal.get("gender", ""), None),
-        "size": size_map.get(animal.get("size", ""), None),
-        "age": age_map.get(animal.get("age", ""), None),
-        "good_with_children": animal.get("environment", {}).get("children"),
+        "pet_id": str(item.get("id", "")),
+        "source": "thedogapi",
+        "type": "Dog",
+        "gender": None,
+        "size": None,
+        "age": None,
+        "good_with_children": good_with_children,
         "Photos": photos,
     }
 
@@ -86,41 +47,128 @@ async def search_petfinder(
     good_with_children: Optional[bool] = None,
     limit: int = 10,
 ) -> list[dict]:
-    """Search Petfinder API and return normalized pet list."""
-    token = await _get_access_token()
-    if not token:
+    """Search TheDogAPI using THE_DOG_API_KEY and return normalized pet list."""
+    if not settings.the_dog_api_key:
+        logger.warning("THE_DOG_API_KEY not configured")
         return []
 
-    # Petfinder uses capitalized values
-    gender_map = {"male": "Male", "female": "Female"}
-    size_map = {"small": "Small", "medium": "Medium", "large": "Large"}
-    age_map = {"baby": "Baby", "young": "Young", "adult": "Adult", "senior": "Senior"}
+    if type and type.lower() == "cat":
+        return []
 
     params: dict = {"limit": min(limit, 100)}
-    if type:
-        params["type"] = type
-    if gender:
-        params["gender"] = gender_map.get(gender.lower(), gender)
-    if size:
-        params["size"] = size_map.get(size.lower(), size)
-    if age:
-        params["age"] = age_map.get(age.lower(), age)
-    if good_with_children is not None:
-        params["good_with_children"] = str(good_with_children).lower()
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             resp = await client.get(
-                f"{PETFINDER_BASE}/animals",
-                headers={"Authorization": f"Bearer {token}"},
+                f"{THE_DOG_API_BASE}/images/search",
+                headers={"x-api-key": settings.the_dog_api_key},
                 params=params,
             )
             if resp.status_code != 200:
-                logger.warning(f"Petfinder search failed [{resp.status_code}]: {resp.text[:200]}")
+                logger.warning(f"TheDogAPI search failed [{resp.status_code}]: {resp.text[:200]}")
                 return []
 
-            animals = resp.json().get("animals", [])
-            return [_map_petfinder_animal(a) for a in animals]
+            items = resp.json()
+            pets = [_map_thedogapi_item(item) for item in items]
+            if good_with_children is True:
+                pets = [pet for pet in pets if pet["good_with_children"]]
+            return pets[:limit]
     except Exception as e:
-        logger.error(f"Petfinder request error: {e}")
+        logger.error(f"TheDogAPI request error: {e}")
         return []
+
+
+async def upload_image(file_data: bytes, filename: str, sub_id: Optional[str] = None) -> dict:
+    """Upload an image to TheDogAPI and return the response."""
+    if not settings.the_dog_api_key:
+        logger.warning("THE_DOG_API_KEY not configured")
+        return {}
+
+    files = {"file": (filename, file_data, "image/jpeg")}
+    data = {}
+    if sub_id:
+        data["sub_id"] = sub_id
+
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                f"{THE_DOG_API_BASE}/images/upload",
+                headers={"x-api-key": settings.the_dog_api_key},
+                files=files,
+                data=data,
+            )
+            if resp.status_code not in {200, 201, 202}:
+                logger.warning(f"TheDogAPI upload failed [{resp.status_code}]: {resp.text[:200]}")
+                return {}
+
+            return resp.json()
+    except Exception as e:
+        logger.error(f"TheDogAPI upload error: {e}")
+        return {}
+
+
+async def list_uploaded_images(sub_id: Optional[str] = None, limit: int = 10) -> list[dict]:
+    """List uploaded images from TheDogAPI."""
+    if not settings.the_dog_api_key:
+        logger.warning("THE_DOG_API_KEY not configured")
+        return []
+
+    params = {"limit": min(limit, 100)}
+    if sub_id:
+        params["sub_id"] = sub_id
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(
+                f"{THE_DOG_API_BASE}/images",
+                headers={"x-api-key": settings.the_dog_api_key},
+                params=params,
+            )
+            if resp.status_code != 200:
+                logger.warning(f"TheDogAPI list failed [{resp.status_code}]: {resp.text[:200]}")
+                return []
+
+            return resp.json()
+    except Exception as e:
+        logger.error(f"TheDogAPI list error: {e}")
+        return []
+
+
+async def get_image_details(image_id: str) -> dict:
+    """Get details of a specific image by ID."""
+    if not settings.the_dog_api_key:
+        logger.warning("THE_DOG_API_KEY not configured")
+        return {}
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(
+                f"{THE_DOG_API_BASE}/images/{image_id}",
+                headers={"x-api-key": settings.the_dog_api_key},
+            )
+            if resp.status_code != 200:
+                logger.warning(f"TheDogAPI get details failed [{resp.status_code}]: {resp.text[:200]}")
+                return {}
+
+            return resp.json()
+    except Exception as e:
+        logger.error(f"TheDogAPI get details error: {e}")
+        return {}
+
+
+async def delete_image(image_id: str) -> bool:
+    """Delete an uploaded image by ID."""
+    if not settings.the_dog_api_key:
+        logger.warning("THE_DOG_API_KEY not configured")
+        return False
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.delete(
+                f"{THE_DOG_API_BASE}/images/{image_id}",
+                headers={"x-api-key": settings.the_dog_api_key},
+            )
+            return resp.status_code == 204
+    except Exception as e:
+        logger.error(f"TheDogAPI delete error: {e}")
+        return False
